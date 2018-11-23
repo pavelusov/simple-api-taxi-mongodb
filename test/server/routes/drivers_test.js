@@ -5,8 +5,8 @@ const app = require('../../../server/app');
 const mongoose = require('mongoose');
 const Driver = mongoose.model('driver');
 
-describe('Driver route', () => {
-  it('POST запрос /api/drivers создает водителя в базе', done => {
+describe('Маршрут Drivers. ', () => {
+  it('POST запрос /api/drivers. Создаем водителя в базе.', done => {
     request(app)
       .post('/api/drivers')
       .send({ email: 'test@test.mail' })
@@ -17,7 +17,7 @@ describe('Driver route', () => {
       })
   });
 
-  it('PUT запрос /api/drivers/id обновляем инфо о водителе', done => {
+  it('PUT запрос /api/drivers/id. Обновляем инфо о водителе.', done => {
     const options = {
       email: 'test@test.com',
       driving: false
@@ -38,6 +38,24 @@ describe('Driver route', () => {
               })
           })
       })
+  });
 
+  it('DELETE запрос /api/drivers/id. Удаляем водителя', done => {
+    const options = {
+      email: 'test@test.com'
+    };
+    const driver = new Driver(options);
+
+    request(app)
+      .delete(`/api/drivers/${driver._id}`)
+      .end(() => {
+        Driver
+          .findOne({email:options.email})
+          .then(driver => {
+            assert(driver === null);
+            done();
+          })
+      });
   })
 });
+

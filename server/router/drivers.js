@@ -32,5 +32,15 @@ router.put('/drivers/:id', (req, res, next) => {
     .catch(next);
 });
 
+router.delete('/drivers/:id', (req, res, next) => {
+  const {
+    params: { id: driverId = '' }
+  } = req;
+  Driver
+    .findByIdAndRemove(driverId)
+    .then(driver => res.status(204).send(driver))
+    .catch(next);
+});
+
 module.exports = router;
 

@@ -8,6 +8,18 @@ router.get('/', (req, res) => {
   res.send({ hi: 'there' })
 });
 
+router.get('/drivers', (req, res, next) => {
+  const { lng = 0, lat = 0 } = req.query;
+
+  Driver.geoNear(
+    { type: 'Point', coordinates: [parseFloat(lng), parseFloat(lat)] },
+    { spherical: true, maxDistance: 200000 } // Unit: meter
+  )
+    .then(drivers => res.send(drivers))
+    .catch(next);
+
+});
+
 // Create driver
 router.post('/drivers', (req, res, next) => {
   const { body: driverProp = {} } = req;
@@ -19,6 +31,7 @@ router.post('/drivers', (req, res, next) => {
     .catch(next);
 });
 
+// Update driver
 router.put('/drivers/:id', (req, res, next) => {
   const {
     body: driverProps = {},
@@ -32,6 +45,7 @@ router.put('/drivers/:id', (req, res, next) => {
     .catch(next);
 });
 
+// Remove driver
 router.delete('/drivers/:id', (req, res, next) => {
   const {
     params: { id: driverId = '' }

@@ -50,12 +50,44 @@ describe('Маршрут Drivers. ', () => {
       .delete(`/api/drivers/${driver._id}`)
       .end(() => {
         Driver
-          .findOne({email:options.email})
+          .findOne({ email: options.email })
           .then(driver => {
             assert(driver === null);
             done();
           })
       });
+  });
+
+  it('GET запрос /api/drivers/id. Ищем водителя вокруг себя. Model.geoNear.', done => {
+    const firstDriver = new Driver({
+      email: 'first@test.com',
+      geometry: {
+        type: 'Point',
+        coordinates: [-122.47, 47.614]
+      }
+    });
+    const secondDriver = new Driver({
+      email: 'first@test.com',
+      geometry: {
+        type: 'Point',
+        coordinates: [-80.253, 25.791]
+      }
+    });
+
+    Promise.all([
+      firstDriver.save(),
+      secondDriver.save()
+    ]).then(() => {
+      request(app)
+        .get('/api/drivers?lng=-80&lat=25')
+        .end((err, response) => {
+          assert(response.body.length === 1);
+          assert(response.body[0].obj.email === 'first@test.com');
+          done();
+        });
+    })
+
   })
+
 });
 
